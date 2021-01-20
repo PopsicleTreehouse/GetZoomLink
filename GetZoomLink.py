@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Coded while I was high on 300 mg of caffeine
-# Proudly speedcoded by Brandon Yao
+# Proudly speedcoded by Me
 
 import datetime
 import json
