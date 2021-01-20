@@ -47,7 +47,7 @@ def get_link(currentDay, dayType):
             return days[0][currentDay-3]
 
 
-def request_links():
+def create_config():
     with open('config.json', 'w') as output:
         while True:
             days = []
@@ -68,5 +68,5 @@ def request_links():
 
 
 if(not path.exists("config.json")):
-    request_links()
+    create_config()
 print(get_link(datetime.today().weekday(), get_day_type()))
