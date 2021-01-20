@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+# @TODO: Check for grade level, only print if grade level matches
+# @TODO: Either ask for period times or automatically give them
+
 from datetime import datetime
 import json
 from os import path
@@ -35,26 +38,36 @@ def get_day_type():
 
 
 def get_link(currentDay, dayType):
+    now = datetime.today().now().strftime('%H:%M')
+    times = [830, 950, 1110]
     with open("config.json") as config:
         days = json.load(config)['Days']
         if(dayType == 1):
             return "No school today"
         elif(dayType == 2):
             return days
+        index = 0
+        if(currentDay != 2):
+            for i in range(len(times)):
+                if(times[i] >= int(now)):
+                    index = i
+                    break
         if(currentDay < 3):
-            return days[0][currentDay]
+            return days[currentDay][index]
         else:
-            return days[0][currentDay-3]
+            return days[currentDay-3][index]
 
 
 def create_config():
     with open('config.json', 'w') as output:
         while True:
             days = []
-            days.append(input("Enter your links for Monday and Thursday: "))
-            days.append(input("Enter your links for Tuesday and Friday: "))
-            days.append(input("Enter your links for Wednesday: "))
-            grade = int(input("What's your grade level? 1-12: "))
+            days.append((
+                input("Enter your links for Monday and Thursday: ")).split(' '))
+            days.append(
+                (input("Enter your links for Tuesday and Friday: ")).split(' '))
+            days.append((input("Enter your links for Wednesday: ")).split(' '))
+            print(days)
             if("" in days):
                 print("\nNot enough zoom links found")
                 if(input("Would you like to retry?: ") in 'yes'):
@@ -63,7 +76,7 @@ def create_config():
                     print("One or more days will be missing a zoom link")
                     break
             json.dump(
-                {'Days': [days], 'Grade': grade}, output, ensure_ascii=False)
+                {'Days': days}, output, ensure_ascii=False)
             return
 
 
