@@ -9,7 +9,7 @@ download and install python [here](https://www.python.org/downloads/)
 Open terminal if you're on mac or linux, cmd if on windows
 type this into the command line:
 
-    cd ZoomLink
+    cd src
     python3 GetZoomLink.py
 
 ## Issues
