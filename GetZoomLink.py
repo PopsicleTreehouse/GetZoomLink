@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # @TODO: Check for grade level, only print if grade level matches
-# @TODO: Either ask for period times or automatically give them
 
-from datetime import datetime
 import json
+import sys
+from datetime import datetime
 from os import path
 
 
@@ -37,21 +37,21 @@ def get_day_type():
         return 3
 
 
-def get_link(currentDay, dayType):
-    now = datetime.today().now().strftime('%H:%M')
-    times = [830, 950, 1110]
+def get_link(currentDay, dayType, times):
+    print(times)
+    now = datetime.today().now().strftime('%H%M')
     with open("config.json") as config:
         days = json.load(config)['Days']
         if(dayType == 1):
             return "No school today"
         elif(dayType == 2):
             return days
-        index = 0
-        if(currentDay != 2):
-            for i in range(len(times)):
-                if(times[i] >= int(now)):
-                    index = i
-                    break
+        for i in range(len(times)):
+            index = len(days[currentDay])-1
+            if(times[i] >= int(now)):
+                print(i)
+                index = i
+                break
         if(currentDay < 3):
             return days[currentDay][index]
         else:
@@ -66,8 +66,8 @@ def create_config():
                 input("Enter your links for Monday and Thursday: ")).split(' '))
             days.append(
                 (input("Enter your links for Tuesday and Friday: ")).split(' '))
-            days.append((input("Enter your links for Wednesday: ")).split(' '))
-            print(days)
+            days.append(
+                (input("Enter your links for Wednesday: ")).split(' '))
             if("" in days):
                 print("\nNot enough zoom links found")
                 if(input("Would you like to retry?: ") in 'yes'):
@@ -82,4 +82,8 @@ def create_config():
 
 if(not path.exists("config.json")):
     create_config()
-print(get_link(datetime.today().weekday(), get_day_type()))
+
+results = list(int(i) for i in sys.argv[1:])
+
+print(get_link(datetime.today().weekday(),
+               get_day_type(), results))

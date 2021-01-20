@@ -10,7 +10,7 @@ Open terminal if you're on mac or linux, cmd if on windows
 type this into the command line:
 
     cd src
-    python3 GetZoomLink.py
+    python3 GetZoomLink.py time time time
 
 Some configuration is necessary:
 if yearly schedule changes,
