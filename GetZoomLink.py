@@ -7,8 +7,6 @@ import tkinter as tk
 import webbrowser
 from datetime import datetime
 
-TK_SILENCE_DEPRECATION = 1
-
 
 class App(tk.Frame):
     def __init__(self, master):
@@ -113,7 +111,7 @@ class App(tk.Frame):
 
 def main():
     root = tk.Tk()
-    root.geometry("550x40")
+    root.geometry("800x40")
     root.title("GetZoomLink.py")
     root.resizable(width=False, height=False)
     App(root).pack(expand=True, fill='both')
