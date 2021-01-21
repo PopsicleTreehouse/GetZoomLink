@@ -39,11 +39,6 @@ class App(tk.Frame):
             datetime.today().weekday(), self.get_day_type()), fg='black')
         button1.pack(side=tk.LEFT)
 
-    def format_url(self, url):
-        if(not re.match('(?:http|ftp|https)://', url)):
-            return 'http://{}'.format(url)
-        return url
-
     def convert_format(self, date, originalFormat):
         ret = datetime.strptime(date, originalFormat)
         ret.strftime("%d/%m/%Y")
@@ -82,6 +77,8 @@ class App(tk.Frame):
                 return "No school today"
             elif(dayType == 2):
                 return days
+            if(currentDay > 3):
+                currentDay = currentDay-3
             index = 0
             for i in range(len(times)):
                 if(i >= len(days[currentDay])):
@@ -89,18 +86,14 @@ class App(tk.Frame):
                 if(int(times[i]) >= int(now)):
                     index = i
                     break
-            if(currentDay < 3):
-                label = tk.Label(
-                    self, text="Your current link is: \""+days[currentDay].split(' ')[index]+"\"", highlightbackground='#3E4149')
-            else:
-                label = tk.Label(
-                    self, text="Your current link is: \""+days[currentDay-3].split(' ')[index]+"\"", highlightbackground='#3E4149')
+            label = tk.Label(
+                self, text="Your current link is: \""+days[currentDay][index]+"\"", highlightbackground='#3E4149')
             label.pack()
 
     def callback(self, isDay):
         with open('config.json', 'w') as output:
             if(isDay):
-                self.days.append(self.dEntry.get())
+                self.days.append(self.dEntry.get().split(' '))
             else:
                 self.times.append(self.tEntry.get())
             self.dEntry.delete(0, 'end')
