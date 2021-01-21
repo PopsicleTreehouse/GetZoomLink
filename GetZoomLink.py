@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # @TODO: Check for grade level, only print if grade level matches
+# @TODO Remove inputs when pressing get link
 
 import json
 import re
@@ -11,6 +12,7 @@ from datetime import datetime
 class App(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master, height=600, width=600)
+        self.createdJson = False
         try:
             f = open('config.json')
             f.close()
@@ -22,22 +24,24 @@ class App(tk.Frame):
             self.dLabel.pack(side=tk.LEFT)
             self.dEntry = tk.Entry(self)
             self.dEntry.pack(side=tk.LEFT)
-            dSubmit = tk.Button(self, text='Submit',
-                                width=10, command=lambda: self.callback(True))
-            dSubmit.pack(side=tk.LEFT)
+            self.dSubmit = tk.Button(self, text='Submit',
+                                     width=10, command=lambda: self.callback(True))
+            self.dSubmit.pack(side=tk.LEFT)
             self.tLabel = tk.Label(
                 self, text="Times", fg='black')
             self.tLabel.pack(side=tk.LEFT)
             self.tEntry = tk.Entry(self)
             self.tEntry.pack(side=tk.LEFT)
-            tSubmit = tk.Button(self, text='Submit',
-                                width=10, command=lambda: self.callback(False))
-            tSubmit.pack(side=tk.LEFT)
-            # json.dump(
-            #     {'Days': self.days, 'Times': self.times}, output, ensure_ascii=False)
+            self.tSubmit = tk.Button(self, text='Submit',
+                                     width=10, command=lambda: self.callback(False))
+            self.tSubmit.pack(side=tk.LEFT)
+            self.createdJson = True
         button1 = tk.Button(self, text='Get Link', command=lambda: self.get_link(
             datetime.today().weekday(), self.get_day_type()), fg='black')
         button1.pack(side=tk.LEFT)
+        self.label = tk.Label(
+            self, highlightbackground='#3E4149')
+        self.label.pack()
 
     def convert_format(self, date, originalFormat):
         ret = datetime.strptime(date, originalFormat)
@@ -77,7 +81,7 @@ class App(tk.Frame):
                 return "No school today"
             elif(dayType == 2):
                 return days
-            if(currentDay > 3):
+            if(currentDay >= 3):
                 currentDay = currentDay-3
             index = 0
             for i in range(len(times)):
@@ -86,9 +90,15 @@ class App(tk.Frame):
                 if(int(times[i]) >= int(now)):
                     index = i
                     break
-            label = tk.Label(
-                self, text="Your current link is: \""+days[currentDay][index]+"\"", highlightbackground='#3E4149')
-            label.pack()
+            if(self.createdJson):
+                self.destroy_items([self.tSubmit, self.tLabel, self.tEntry,
+                                    self.dSubmit, self.dLabel, self.dSubmit])
+            self.label.config(text="Your current link is: \"" +
+                              days[currentDay][index]+"\"")
+
+    def destroy_items(self, items):
+        for i in items:
+            i.destroy()
 
     def callback(self, isDay):
         with open('config.json', 'w') as output:
