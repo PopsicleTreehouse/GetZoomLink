@@ -11,6 +11,35 @@ TK_SILENCE_DEPRECATION = 1
 
 
 class App(tk.Frame):
+    def __init__(self, master):
+        tk.Frame.__init__(self, master, height=600, width=600)
+        try:
+            f = open('config.json')
+            f.close()
+        except FileNotFoundError:
+            self.times = []
+            self.days = []
+            self.dLabel = tk.Label(
+                self, text="Links", fg='black')
+            self.dLabel.pack(side=tk.LEFT)
+            self.dEntry = tk.Entry(self)
+            self.dEntry.pack(side=tk.LEFT)
+            dSubmit = tk.Button(self, text='Submit',
+                                width=10, command=lambda: self.callback(True))
+            dSubmit.pack(side=tk.LEFT)
+            self.tLabel = tk.Label(
+                self, text="Times", fg='black')
+            self.tLabel.pack(side=tk.LEFT)
+            self.tEntry = tk.Entry(self)
+            self.tEntry.pack(side=tk.LEFT)
+            tSubmit = tk.Button(self, text='Submit',
+                                width=10, command=lambda: self.callback(False))
+            tSubmit.pack(side=tk.LEFT)
+            # json.dump(
+            #     {'Days': self.days, 'Times': self.times}, output, ensure_ascii=False)
+        button1 = tk.Button(self, text='Get Link', command=lambda: self.get_link(
+            datetime.today().weekday(), self.get_day_type()), fg='black')
+        button1.pack(side=tk.LEFT)
 
     def format_url(self, url):
         if(not re.match('(?:http|ftp|https)://', url)):
@@ -68,7 +97,6 @@ class App(tk.Frame):
             else:
                 label = tk.Label(
                     self, text="Your current link is: \""+days[currentDay-3].split(' ')[index]+"\"", highlightbackground='#3E4149')
-            label.grid(row=0)
             label.pack()
 
     def callback(self, isDay):
@@ -82,48 +110,12 @@ class App(tk.Frame):
             json.dump(
                 {'Days': self.days, 'Times': self.times}, output, ensure_ascii=False)
 
-    def __init__(self, master):
-        tk.Frame.__init__(self, master, height=600, width=600)
-        try:
-            f = open('config.json')
-            f.close()
-        except FileNotFoundError:
-            self.times = []
-            self.days = []
-            self.questions = ["Monday, Thursday",
-                              "Tuesday, Friday", "Wednesday"]
-            self.dLabel = tk.Label(
-                self, text=self.questions[0], fg='black')
-            self.dLabel.grid(row=0)
-            self.dLabel.pack()
-            self.dEntry = tk.Entry(self)
-            self.dEntry.grid(row=0, column=1)
-            self.dEntry.pack()
-            dSubmit = tk.Button(self, text='Submit',
-                                width=10, command=lambda: self.callback(True))
-            dSubmit.grid(row=0, column=1)
-            dSubmit.pack()
-            self.tLabel = tk.Label(
-                self, text="hello", fg='black')
-            self.tLabel.grid(row=0)
-            self.tLabel.pack()
-            self.tEntry = tk.Entry(self)
-            self.tEntry.grid(row=0, column=1)
-            self.tEntry.pack()
-            tSubmit = tk.Button(self, text='Submit',
-                                width=10, command=lambda: self.callback(False))
-            tSubmit.grid(row=0, column=1)
-            tSubmit.pack()
-            # json.dump(
-            #     {'Days': self.days, 'Times': self.times}, output, ensure_ascii=False)
-        button1 = tk.Button(self, text='Get Link', command=lambda: self.get_link(
-            datetime.today().weekday(), self.get_day_type()), fg='black')
-        button1.grid(row=0, column=0)
-        button1.pack()
-
 
 def main():
     root = tk.Tk()
+    root.geometry("550x40")
+    root.title("GetZoomLink.py")
+    root.resizable(width=False, height=False)
     App(root).pack(expand=True, fill='both')
     root.mainloop()
 
