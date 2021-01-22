@@ -35,7 +35,7 @@ class App(tk.Frame):
         button1 = tk.Button(self, text="Get Link", command=lambda: self.get_link(
             datetime.today().weekday(), self.get_day_type()), fg="black",)
         button1.pack(side=tk.LEFT)
-        self.label = tk.Label(self, highlightbackground="#3E4149")
+        self.label = tk.Label(self, highlightbackground="#3E4149". fg="black")
         self.label.pack()
 
     def destroy_items(self, items):
