@@ -4,7 +4,6 @@
 
 import json
 import tkinter as tk
-import webbrowser
 from datetime import datetime
 
 
