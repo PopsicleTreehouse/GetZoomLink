@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # @TODO: Check for grade level, only print if grade level matches
-# @TODO: Replace link input with time input
 
 import json
 import tkinter as tk
@@ -17,39 +16,39 @@ class App(tk.Frame):
         except FileNotFoundError:
             self.times = []
             self.days = []
-            self.dLabel = tk.Label(self, text="Links", fg="black")
-            self.dLabel.pack(side=tk.LEFT)
-            self.dEntry = tk.Entry(self)
-            self.dEntry.pack(side=tk.LEFT)
-            self.dSubmit = tk.Button(
-                self, text="Submit", width=10, command=lambda: self.callback(True))
-            self.dSubmit.pack(side=tk.LEFT)
-            self.tLabel = tk.Label(self, text="Times", fg="black")
-            self.tLabel.pack(side=tk.LEFT)
-            self.tEntry = tk.Entry(self)
-            self.tEntry.pack(side=tk.LEFT)
-            self.tSubmit = tk.Button(
-                self, text="Submit", width=10, command=lambda: self.callback(False))
-            self.tSubmit.pack(side=tk.LEFT)
+            self.entryLabel = tk.Label(self, text="Link Monday", fg="black")
+            self.entryLabel.pack(side=tk.LEFT)
+            self.entry = tk.Entry(self)
+            self.entry.pack(side=tk.LEFT)
+            self.Submit = tk.Button(
+                self, text="Submit", width=10, command=lambda: self.callback(True, 0))
+            self.Submit.pack(side=tk.LEFT)
             self.createdJson = True
-        button1 = tk.Button(self, text="Get Link", command=lambda: self.get_link(
-            datetime.today().weekday(), self.get_day_type()), fg="black",)
+        button1 = tk.Button(self, text="Get Link", command=lambda: self.get_link(datetime.today().weekday(), self.get_day_type()),
+                            fg="black")
         button1.pack(side=tk.LEFT)
-        self.label = tk.Label(self, highlightbackground="#3E4149". fg="black")
+        self.label = tk.Label(self, highlightbackground="#3E4149", fg="black")
         self.label.pack()
 
     def destroy_items(self, items):
         for i in items:
             i.destroy()
 
-    def callback(self, isDay):
+    def callback(self, isDay, day):
         with open("config.json", "w") as output:
+            days = ["Links Monday", "Links Tuesday", "Links Wednesday"]
             if isDay:
-                self.days.append(self.dEntry.get().split(" "))
+                self.days.append(self.entry.get().split(" "))
             else:
-                self.times.append(self.tEntry.get())
-            self.dEntry.delete(0, "end")
-            self.tEntry.delete(0, "end")
+                self.times.append(self.entry.get())
+            self.entry.delete(0, "end")
+            if(day < 2):
+                self.Submit.config(
+                    command=lambda: self.callback(True, day+1))
+                self.entryLabel.config(text=days[day+1])
+            else:
+                self.Submit.config(command=lambda: self.callback(False, day))
+                self.entryLabel.config(text="Times")
             json.dump({"Days": self.days, "Times": self.times},
                       output, ensure_ascii=False)
 
@@ -87,26 +86,19 @@ class App(tk.Frame):
             elements = json.load(config)
             times = elements["Times"]
             days = elements["Days"]
-            if dayType == 1:
-                return "No school today"
-            elif dayType == 2:
-                return days
             if currentDay >= 3:
                 currentDay = currentDay - 3
-            index = 0
             index = times.index(
                 times[min(range(len(times)), key=lambda i: abs(int(times[i]) - int(now)))])
-            # for i in range(len(times)):
-            #     if(i >= len(days[currentDay])):
-            #         break
-            #     if(int(times[i]) >= int(now)):
-            #         index = i
-            #         break
+            labelText = "Next link: \""+days[currentDay][index]+"\""
+            if dayType == 1:
+                labelText = "No school today"
+            elif dayType == 2:
+                labelText = days
             if self.createdJson:
                 self.destroy_items(
-                    [self.tSubmit, self.tLabel, self.tEntry, self.dSubmit, self.dLabel, self.dSubmit, ])
-            self.label.config(text='Your current link is: "' +
-                              days[currentDay][index] + '"')
+                    [self.Submit, self.entryLabel, self.entry])
+            self.label.config(text=labelText)
 
 
 def main():
