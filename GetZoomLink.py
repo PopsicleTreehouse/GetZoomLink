@@ -24,7 +24,7 @@ class App(tk.Frame):
                 self, text="Submit", width=10, command=lambda: self.callback(True, 0))
             self.Submit.pack(side=tk.LEFT)
             self.createdJson = True
-        button1 = tk.Button(self, text="Get Link", command=lambda: self.get_link(datetime.today().weekday(), self.get_day_type()),
+        button1 = tk.Button(self, text="Copy Link", command=lambda: self.get_link(datetime.today().weekday(), self.get_day_type()),
                             fg="black")
         button1.pack(side=tk.LEFT)
         self.label = tk.Label(self, highlightbackground="#3E4149", fg="black")
@@ -98,6 +98,8 @@ class App(tk.Frame):
             if self.createdJson:
                 self.destroy_items(
                     [self.Submit, self.entryLabel, self.entry])
+            self.clipboard_clear()
+            self.clipboard_append(labelText)
             self.label.config(text=labelText)
 
 
