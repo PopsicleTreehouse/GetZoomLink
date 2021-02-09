@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # @TODO: Check for grade level, only print if grade level matches
+# @TODO: Fix mimimum day copy system
 
 import json
 import tkinter as tk
@@ -27,8 +28,9 @@ class App(tk.Frame):
         button1 = tk.Button(self, text="Copy Link", command=lambda: self.get_link(datetime.today().weekday(), self.get_day_type()),
                             fg="black")
         button1.pack(side=tk.LEFT)
-        self.label = tk.Label(self, highlightbackground="#3E4149", fg="black")
-        self.label.pack()
+        self.linkLabel = tk.Label(
+            self, highlightbackground="#3E4149", fg="black")
+        self.linkLabel.pack()
 
     def destroy_items(self, items):
         for i in items:
@@ -42,7 +44,7 @@ class App(tk.Frame):
             else:
                 self.times.append(self.entry.get())
             self.entry.delete(0, "end")
-            if(day < 2):
+            if day < 2:
                 self.Submit.config(
                     command=lambda: self.callback(True, day+1))
                 self.entryLabel.config(text=days[day+1])
@@ -65,19 +67,20 @@ class App(tk.Frame):
             dateData = data["Dates"]
             breakData = data["Breaks"]
             today = datetime.now().strftime("%A %B %d %Y")
+            day = today
             if today in dateData[0]:
                 day = dateData[0][today].lower()
-                if day.find("no school") > 0:
-                    return 1
-                elif day.find("minimum") > 0:
-                    return 2
             today = self.convert_format(today, "%A %B %d %Y")
             for i in range(len(breakData)):
                 breakRange = list(breakData[i])
                 start = self.convert_format(breakRange[0], "%B %d %Y")
                 end = self.convert_format(breakRange[1], "%B %d %Y")
                 if start <= today <= end:
-                    return 1
+                    day = breakData[i][end.strftime("%B %d %Y")].lower()
+            if day.find("no school") > 0:
+                return 1
+            elif day.find("minimum") > 0:
+                return 2
             return 3
 
     def get_link(self, currentDay, dayType):
@@ -88,19 +91,20 @@ class App(tk.Frame):
             days = elements["Days"]
             if currentDay >= 3:
                 currentDay = currentDay - 3
-            index = times.index(
-                times[min(range(len(times)), key=lambda i: abs(int(times[i]) - int(now)))])
-            labelText = "Next link: \""+days[currentDay][index]+"\""
-            if dayType == 1:
-                labelText = "No school today"
-            elif dayType == 2:
-                labelText = days
+            # takes closest number to current time as index
+            index = min(range(len(times)), key=lambda i: abs(
+                int(times[i]) - int(now)))
+            if(currentDay == 2):
+                index = 0
+            labels = ["No school today", days,
+                      "Next link: \""+days[currentDay][index]+"\""]
+            labelText = labels[dayType-1]
             if self.createdJson:
                 self.destroy_items(
                     [self.Submit, self.entryLabel, self.entry])
             self.clipboard_clear()
-            self.clipboard_append(labelText)
-            self.label.config(text=labelText)
+            self.clipboard_append(days[currentDay][index])
+            self.linkLabel.config(text=labelText)
 
 
 def main():

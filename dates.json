@@ -4,6 +4,9 @@
           "Monday September 07 2020":"Labor Day: No School",
           "Friday October 31 2020":"TK-12 Minimum Day",
           "Wednesday November 11 2020":"Veterans Day: No school",
+          "Monday November 16 2020":"Grades 4-5 Minimum Day",
+          "Friday November 20 2020":"TK-5 Conference Day: No school for TK-5 students",
+          "Friday, December 18 2020":"TK-8 Minimum Day",
           "Monday January 04 2021":"Grades 6-12 Teacher Work Day No School for Grade 6-12 students",
           "Monday January 18 2021":"Martin Luther King Jr. Day: No School",
           "Monday February 08 2021":"Holiday: No school",
@@ -11,10 +14,16 @@
           "Monday February 15 2021":"President’s Day: No school",
           "Friday March 12 2021":"Staff Development Day: No School",
           "Monday March 15 2021":"No School",
-          "Friday April 02 2021":"Holiday: No School"
+          "Friday April 02 2021":"Holiday: No School",
+          "Friday May 14 2021":"TK - 5 Minimum Day",
+          "Friday May 28 2021":"Last Day of School: Minimum Day (TK-8)"
         }
     ],
     "Breaks":[
+        {
+            "November 17 2020":"TK-5 Minimum Day",
+            "November 19 2020":"TK-5 Minimum Day"
+        },
         {
             "November 23 2020":"Thanksgiving Break: No School",
             "November 27 2020":"Thanksgiving Break: No School"
