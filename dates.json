@@ -1,5 +1,5 @@
 {
-    "Dates":[
+    "dates":[
        {
           "Monday September 07 2020":"Labor Day: No School",
           "Friday October 31 2020":"TK-12 Minimum Day",
@@ -19,7 +19,7 @@
           "Friday May 28 2021":"Last Day of School: Minimum Day (TK-8)"
         }
     ],
-    "Breaks":[
+    "breaks":[
         {
             "November 17 2020":"TK-5 Minimum Day",
             "November 19 2020":"TK-5 Minimum Day"
