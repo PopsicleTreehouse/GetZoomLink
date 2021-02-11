@@ -1,9 +1,6 @@
 #!/usr/bin/python3
-# @TODO: Check for grade level, only print if grade level matches (regex?)
+# @TODO: Check for grade level, only print if grade level matches
 # @TODO: Fix mimimum day copy system
-# @TODO: Fix list joining system (it joins the two lists correctly but they're formatted so that it goes 1 3 5 2 4 6)
-# I'm like 80% sure half the code here is really shit
-# Honestly I should probably use a different GUI library I just don't want to go through that hassle
 
 import json
 import tkinter as tk
@@ -55,18 +52,15 @@ class App(tk.Frame):
                 self.manual = config["manual"]
                 if(self.manual):
                     lnk = list(chain.from_iterable(config["links"]))
-                    for i in range(len(lnk)//2):
-                        p1Button = tk.Button(self, text="Period " + str(i+i+1), command=partial(self.get_link, self.get_day_type(), "Period "+str(i*2+1), period=i, lst=0),
-                                             fg="black")
-                        p1Button.pack(side=tk.LEFT, padx=21-len(lnk))
-                        p2Button = tk.Button(self, text="Period " + str(i+i+2), command=partial(self.get_link, self.get_day_type(), "Period "+str(i*2+2), period=i, lst=1),
-                                             fg="black")
-                        p2Button.pack(side=tk.LEFT, padx=21-len(lnk))
-                    access = tk.Button(self, text="Access", command=lambda: self.get_link(self.get_day_type(), "Access"),
+                    for i in range(len(lnk)-1):
+                        pButton = tk.Button(self, text="Period " + str(i+1), command=partial(self.get_link, datetime.today().weekday(), self.get_day_type(), period=i),
+                                            fg="black")
+                        pButton.pack(side=tk.LEFT)
+                    access = tk.Button(self, text="Access", command=lambda: self.get_link(datetime.today().weekday(), self.get_day_type(), period=len(lnk)-1),
                                        fg="black")
-                    access.pack(side=tk.LEFT, padx=21-len(lnk))
+                    access.pack(side=tk.LEFT)
                 else:
-                    copy = tk.Button(self, text="Copy Link", command=lambda: self.get_link(self.get_day_type()),
+                    copy = tk.Button(self, text="Copy Link", command=lambda: self.get_link(datetime.today().weekday(), self.get_day_type()),
                                      fg="black")
                     copy.pack(side=tk.LEFT)
 
@@ -124,10 +118,9 @@ class App(tk.Frame):
                 return 2
             return 3
 
-    def get_link(self, dayType, text=None, period=0, lst=2):
+    def get_link(self, currentDay, dayType, period=None):
         now = datetime.today().now().strftime("%H%M")
         with open("config.json") as config:
-            currentDay = datetime.today().weekday()
             elements = json.load(config)
             times = elements["times"]
             links = elements["links"]
@@ -136,19 +129,13 @@ class App(tk.Frame):
             # takes closest number to current time as index
             index = min(range(len(times)), key=lambda i: abs(
                 int(times[i]) - int(now)))
-
             if(currentDay == 2):
                 index = 0
             currentPeriod = links[currentDay][index]
             if(self.manual):
-                index = period
-                currentPeriod = links[lst][period]
-            elif(not self.manual and currentDay == 2):
-                text = "Access"
-            if(text == None):
-                text = "Period " + str(index)
+                currentPeriod = list(chain.from_iterable(links))[period]
             labels = ["No school today", links,
-                      f"{text} Link: \"{currentPeriod}\""]
+                      "Next link: \""+currentPeriod+"\""]
             labelText = labels[dayType-1]
             self.clipboard_clear()
             self.clipboard_append(currentPeriod)
