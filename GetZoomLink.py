@@ -1,7 +1,4 @@
 #!/usr/bin/python3
-# @TODO: Check for grade level, only print if grade level matches
-# @TODO: Fix mimimum day copy system
-
 import json
 import tkinter as tk
 from datetime import datetime
