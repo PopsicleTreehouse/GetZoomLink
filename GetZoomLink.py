@@ -39,7 +39,6 @@ class App(tk.Frame):
                 self, text="Get link", command=lambda: self.create_btn())
             self.confirm.pack(side=tk.LEFT)
 
-    # {"links": [["https://pleasantonusd.zoom.us/j/91423967023", "https://pleasantonusd.zoom.us/j/98940695539", "https://pleasantonusd.zoom.us/j/92308403627"], ["https://pleasantonusd.zoom.us/j/97145648476?pwd=RGZTelZiMzJTa0sxelM5QVQvNk40UT09", "https://pleasantonusd.zoom.us/j/99537793707?pwd=Si8wVUZ1aFFBUUhabVpoME9YL0ZRQT09", "https://pleasantonusd.zoom.us/j/89495170511"], ["https://pleasantonusd.zoom.us/j/94553465337"]], "times": ["830", "950", "1110"], "manual": true}
     def create_btn(self):
         try:
             if(hasattr(self, "manualCheckbox")):
@@ -74,7 +73,7 @@ class App(tk.Frame):
                     copy.pack(side=tk.LEFT)
 
         except FileNotFoundError:
-            self.confirm.config(text="Fuck")
+            self.confirm.config(text="I don't know how this happened")
 
     def destroy_items(self, items):
         for i in items:
@@ -148,10 +147,14 @@ class App(tk.Frame):
             elif(currentDay == 2):
                 text = "Access"
             if(text == None):
-                hackyWorkaround = []
-                temp = 1
-                for i in range(len(list(chain.from_iterable(config["links"])))):
-                    hackyWorkaround[not temp].append(i)
+                # This is horrible and I probably shouldn't be using it but I'm sick of bug fixes
+                hackyWorkaround = [[], []]
+                arrIndex = 0
+                lnk = links[0]
+                lnk.extend(links[1])
+                for i in range(1, len(lnk)+1):
+                    hackyWorkaround[not arrIndex].append(i)
+                    arrIndex = not arrIndex
                 text = "Period " + str(hackyWorkaround[currentDay][index])
             labels = ["No school today", links,
                       f"{text} Link: \"{currentPeriod}\""]
@@ -163,7 +166,6 @@ class App(tk.Frame):
 
 def main():
     root = tk.Tk()
-    # root.geometry("800x80")
     root.minsize(800, 80)
     root.title("GetZoomLink.py")
     App(root).pack(expand=True, fill="both")
