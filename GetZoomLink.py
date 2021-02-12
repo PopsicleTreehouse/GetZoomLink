@@ -15,7 +15,6 @@ class App(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         self.createdJson = False
-        self.manual = False
         try:
             f = open("config.json")
             f.close()
@@ -23,6 +22,7 @@ class App(tk.Frame):
         except FileNotFoundError:
             self.times = []
             self.links = []
+            self.manual = tk.IntVar()
             self.entryLabel = tk.Label(
                 self, text="Link Monday", fg="black")
             self.entryLabel.pack(side=tk.LEFT)
@@ -36,16 +36,19 @@ class App(tk.Frame):
             self.manualCheckbox.pack(side=tk.LEFT)
             self.createdJson = True
             self.confirm = tk.Button(
-                self, text="Get link", command=lambda: self.create_btn(confirm=True))
+                self, text="Get link", command=lambda: self.create_btn())
             self.confirm.pack(side=tk.LEFT)
 
-    def create_btn(self, confirm=False):
+    # {"links": [["https://pleasantonusd.zoom.us/j/91423967023", "https://pleasantonusd.zoom.us/j/98940695539", "https://pleasantonusd.zoom.us/j/92308403627"], ["https://pleasantonusd.zoom.us/j/97145648476?pwd=RGZTelZiMzJTa0sxelM5QVQvNk40UT09", "https://pleasantonusd.zoom.us/j/99537793707?pwd=Si8wVUZ1aFFBUUhabVpoME9YL0ZRQT09", "https://pleasantonusd.zoom.us/j/89495170511"], ["https://pleasantonusd.zoom.us/j/94553465337"]], "times": ["830", "950", "1110"], "manual": true}
+    def create_btn(self):
         try:
-            if(confirm):
+            if(hasattr(self, "manualCheckbox")):
+                self.manualCheckbox.pack_forget()
+            if(hasattr(self, "confirm")):
                 self.confirm.destroy()
             if(self.createdJson):
                 self.destroy_items(
-                    [self.Submit, self.entryLabel, self.entry, self.manualCheckbox])
+                    [self.Submit, self.entryLabel, self.entry])
             with open("config.json") as f:
                 self.linkLabel = tk.Label(
                     self, fg="black")
@@ -53,7 +56,8 @@ class App(tk.Frame):
                 config = json.load(f)
                 self.manual = config["manual"]
                 if(self.manual):
-                    lnk = list(chain.from_iterable(config["links"]))
+                    lnk = config["links"][0]
+                    lnk.extend(config["links"][1])
                     for i in range(len(lnk)//2):
                         p1Button = tk.Button(self, text="Period " + str(i+i+1), command=partial(self.get_link, self.get_day_type(), "Period "+str(i*2+1), period=i, lst=0),
                                              fg="black")
@@ -91,7 +95,7 @@ class App(tk.Frame):
             else:
                 self.Submit.config(command=lambda: self.callback(False, day))
                 self.entryLabel.config(text="Times")
-            json.dump({"links": self.links, "times": self.times, "manual": self.manual},
+            json.dump({"links": self.links, "times": self.times, "manual": self.manual.get()},
                       output, ensure_ascii=False)
 
     def convert_format(self, date, originalFormat):
@@ -140,11 +144,14 @@ class App(tk.Frame):
             currentPeriod = links[currentDay][index]
             if(self.manual):
                 index = period
-                currentPeriod = links[lst][period]
+                currentPeriod = links[lst][index]
             elif(currentDay == 2):
                 text = "Access"
             if(text == None):
-                hackyWorkaround = [[1, 3, 5], [2, 4, 6]]
+                hackyWorkaround = []
+                temp = 1
+                for i in range(len(list(chain.from_iterable(config["links"])))):
+                    hackyWorkaround[not temp].append(i)
                 text = "Period " + str(hackyWorkaround[currentDay][index])
             labels = ["No school today", links,
                       f"{text} Link: \"{currentPeriod}\""]
@@ -156,9 +163,9 @@ class App(tk.Frame):
 
 def main():
     root = tk.Tk()
-    root.geometry("800x80")
+    # root.geometry("800x80")
+    root.minsize(800, 80)
     root.title("GetZoomLink.py")
-    root.resizable(width=True, height=False)
     App(root).pack(expand=True, fill="both")
     root.mainloop()
 
