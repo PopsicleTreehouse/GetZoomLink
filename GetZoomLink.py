@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # @TODO: Check for grade level, only print if grade level matches (regex?)
 # @TODO: Fix mimimum day copy system
-# @TODO: Fix list joining system (it joins the two lists correctly but they're formatted so that it goes 1 3 5 2 4 6)
 # I'm like 80% sure half the code here is really shit
 # Honestly I should probably use a different GUI library I just don't want to go through that hassle
 
@@ -14,7 +13,7 @@ from itertools import chain
 
 class App(tk.Frame):
     def __init__(self, master):
-        tk.Frame.__init__(self, master, height=900, width=600)
+        tk.Frame.__init__(self, master)
         self.createdJson = False
         self.manual = False
         try:
@@ -38,7 +37,7 @@ class App(tk.Frame):
             self.createdJson = True
             self.confirm = tk.Button(
                 self, text="Get link", command=lambda: self.create_btn(confirm=True))
-            self.confirm.pack()
+            self.confirm.pack(side=tk.LEFT)
 
     def create_btn(self, confirm=False):
         try:
@@ -49,7 +48,7 @@ class App(tk.Frame):
                     [self.Submit, self.entryLabel, self.entry, self.manualCheckbox])
             with open("config.json") as f:
                 self.linkLabel = tk.Label(
-                    self, highlightbackground="#3E4149", fg="black")
+                    self, fg="black")
                 self.linkLabel.pack()
                 config = json.load(f)
                 self.manual = config["manual"]
@@ -136,17 +135,17 @@ class App(tk.Frame):
             # takes closest number to current time as index
             index = min(range(len(times)), key=lambda i: abs(
                 int(times[i]) - int(now)))
-
             if(currentDay == 2):
                 index = 0
             currentPeriod = links[currentDay][index]
             if(self.manual):
                 index = period
                 currentPeriod = links[lst][period]
-            elif(not self.manual and currentDay == 2):
+            elif(currentDay == 2):
                 text = "Access"
             if(text == None):
-                text = "Period " + str(index)
+                hackyWorkaround = [[1, 3, 5], [2, 4, 6]]
+                text = "Period " + str(hackyWorkaround[currentDay][index])
             labels = ["No school today", links,
                       f"{text} Link: \"{currentPeriod}\""]
             labelText = labels[dayType-1]
