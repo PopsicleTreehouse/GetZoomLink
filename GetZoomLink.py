@@ -138,14 +138,18 @@ class App(tk.Frame):
             # takes closest number to current time as index
             index = min(range(len(times)), key=lambda i: abs(
                 int(times[i]) - int(now)))
+            currentPeriod = links[currentDay][index]
+            labels = ["No school today", links,
+                      f"{text} Link: \"{currentPeriod}\""]
             if(currentDay == 2):
                 index = 0
-            currentPeriod = links[currentDay][index]
-            if(self.manual):
+                text = "Access"
+            elif(self.manual):
                 index = period
                 currentPeriod = links[lst][index]
-            elif(currentDay == 2):
-                text = "Access"
+                labelText = f"{text} Link: \"{currentPeriod}\""
+            else:
+                labelText = labels[dayType-1]
             if(text == None):
                 # This is horrible and I probably shouldn't be using it but I'm sick of bug fixes
                 hackyWorkaround = [[], []]
@@ -156,9 +160,6 @@ class App(tk.Frame):
                     hackyWorkaround[not arrIndex].append(i)
                     arrIndex = not arrIndex
                 text = "Period " + str(hackyWorkaround[currentDay][index])
-            labels = ["No school today", links,
-                      f"{text} Link: \"{currentPeriod}\""]
-            labelText = labels[dayType-1]
             self.clipboard_clear()
             self.clipboard_append(currentPeriod)
             self.linkLabel.config(text=labelText)
@@ -167,7 +168,7 @@ class App(tk.Frame):
 def main():
     root = tk.Tk()
     root.minsize(800, 80)
-    root.title("GetZoomLink.py")
+    root.title("Get Zoom Link")
     App(root).pack(expand=True, fill="both")
     root.mainloop()
 
