@@ -101,7 +101,6 @@ class App(tk.Frame):
         return ret
 
     def get_day_type(self):
-        return 3
         if(datetime.today().weekday() > 4):
             return 1
         with open("dates.json") as f:
