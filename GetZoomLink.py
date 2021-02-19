@@ -1,22 +1,17 @@
 #!/usr/bin/python3
 # @TODO: Check for grade level, only print if grade level matches (regex?)
 # @TODO: Fix mimimum day copy system
-# I'm like 80% sure half the code here is really shit
-# Honestly I should probably use a different GUI library I just don't want to go through that hassle
+# @TODO: Update dates.json based on website
 
 import json
 import tkinter as tk
 from datetime import datetime
-from functools import partial
-from itertools import chain
-
-# {"links": [["https://pleasantonusd.zoom.us/j/91423967023", "https://pleasantonusd.zoom.us/j/98940695539", "https://pleasantonusd.zoom.us/j/92308403627"], ["https://pleasantonusd.zoom.us/j/97145648476?pwd=RGZTelZiMzJTa0sxelM5QVQvNk40UT09", "https://pleasantonusd.zoom.us/j/99537793707?pwd=Si8wVUZ1aFFBUUhabVpoME9YL0ZRQT09", "https://pleasantonusd.zoom.us/j/89495170511"], ["https://pleasantonusd.zoom.us/j/94553465337"]], "times": ["830", "950", "1110"], "manual": true}
 
 
 class App(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
-        self.createdJson = False
+        self.calledAfterJSON = False
         try:
             f = open("config.json")
             f.close()
@@ -36,64 +31,67 @@ class App(tk.Frame):
             self.manualCheckbox = tk.Checkbutton(
                 self, text="Manual period selection", variable=self.manual)
             self.manualCheckbox.pack(side=tk.LEFT)
-            self.createdJson = True
+            self.calledAfterJSON = True
             self.confirm = tk.Button(
-                self, text="Get link", command=lambda: self.create_btn())
+                self, text="Get link", command=self.create_btn)
             self.confirm.pack(side=tk.LEFT)
 
     def create_btn(self):
-        try:
-            if(hasattr(self, "manualCheckbox")):
-                self.manualCheckbox.pack_forget()
-            if(hasattr(self, "confirm")):
-                self.confirm.destroy()
-            if(self.createdJson):
-                self.destroy_items(
-                    [self.Submit, self.entryLabel, self.entry])
-            with open("config.json") as f:
-                self.linkLabel = tk.Label(
-                    self, fg="black")
-                self.linkLabel.pack()
-                config = json.load(f)
-                self.manual = config["manual"]
-                if(self.manual):
-                    lnk = config["links"]
-                    for i in range(len(lnk)-1):
-                        p1Button = tk.Button(self, text="Period " + str(i+1), command=partial(self.get_link, self.get_day_type(), "Period "+str(i+1), period=i),
-                                             fg="black")
-                        p1Button.pack(side=tk.LEFT, padx=21-len(lnk))
-                    access = tk.Button(self, text="Access", command=lambda: self.get_link(self.get_day_type(), "Access"),
-                                       fg="black")
-                    access.pack(side=tk.LEFT, padx=21-len(lnk))
-                else:
-                    copy = tk.Button(self, text="Copy Link", command=lambda: self.get_link(self.get_day_type()),
-                                     fg="black")
-                    copy.pack(side=tk.LEFT)
-
-        except FileNotFoundError:
-            self.confirm.config(text="I don't know how this happened")
+        if(hasattr(self, "manualCheckbox")):
+            self.manualCheckbox.pack_forget()
+        if(hasattr(self, "confirm")):
+            self.confirm.destroy()
+        if(self.calledAfterJSON):
+            self.destroy_items(
+                [self.Submit, self.entryLabel, self.entry])
+        with open("config.json") as f:
+            self.linkLabel = tk.Label(
+                self, fg="black")
+            self.linkLabel.pack()
+            config = json.load(f)
+            self.manual = config["manual"]
+            if(self.manual):
+                lnk = config["links"]
+                for i in range(len(lnk)-1):
+                    tk.Button(self, text="Period " + str(i+1), command=lambda i=i: self.display_link(self.get_day_type(), text="Period "+str(i+1), period=i),
+                              fg="black").pack(side=tk.LEFT, padx=21-len(lnk))
+                tk.Button(self, text="Access", command=lambda: self.display_link(self.get_day_type(), text="Access"),
+                          fg="black").pack(side=tk.LEFT, padx=21-len(lnk))
+            else:
+                tk.Button(self, text="Copy Link", command=lambda: self.display_link(self.get_day_type()),
+                          fg="black").pack(side=tk.LEFT)
 
     def destroy_items(self, items):
         for i in items:
             i.destroy()
 
-    # {"links": [["https://pleasantonusd.zoom.us/j/91423967023", "https://pleasantonusd.zoom.us/j/98940695539", "https://pleasantonusd.zoom.us/j/92308403627"], ["https://pleasantonusd.zoom.us/j/97145648476?pwd=RGZTelZiMzJTa0sxelM5QVQvNk40UT09", "https://pleasantonusd.zoom.us/j/99537793707?pwd=Si8wVUZ1aFFBUUhabVpoME9YL0ZRQT09", "https://pleasantonusd.zoom.us/j/89495170511"], ["https://pleasantonusd.zoom.us/j/94553465337"]], "times": ["830", "950", "1110"], "manual": 1}
-    def callback(self, isDay, day):
+    def callback(self, isDay, day=6):
         with open("config.json", "w") as output:
-            if(isDay):
-                self.links.append(self.entry.get())
-            else:
-                self.times.append(self.entry.get())
+            try:
+                if(hasattr(self, "warningLabel")):
+                    self.warningLabel.destroy()
+                if(isDay):
+                    self.links.append(self.entry.get())
+                else:
+                    self.times.append(int(self.entry.get()))
+            except ValueError:
+                self.warningLabel = tk.Label(
+                    self, text="Enter a time instead!", fg="black")
+                self.warningLabel.pack()
             self.entry.delete(0, "end")
-            if(day) < 5:
+            if(day < 5):
                 self.Submit.config(
-                    command=lambda: self.callback(True, day+1))
+                    command=lambda: self.callback(True, day=day+1))
                 self.entryLabel.config(text="Link P" + str(day+2))
+            elif(day == 5):
+                self.Submit.config(
+                    command=lambda: self.callback(True, day=day+1))
+                self.entryLabel.config(text="Link Access")
             else:
-                self.Submit.config(command=lambda: self.callback(False, day))
+                self.Submit.config(command=lambda: self.callback(False))
                 self.entryLabel.config(text="Times")
             json.dump({"links": self.links, "times": self.times, "manual": self.manual.get()},
-                      output, ensure_ascii=False)
+                      output, ensure_ascii=False, indent=4)
 
     def convert_format(self, date, originalFormat):
         ret = datetime.strptime(date, originalFormat)
@@ -124,7 +122,7 @@ class App(tk.Frame):
                 return 2
             return 3
 
-    def get_link(self, dayType, text=None, period=6):
+    def display_link(self, dayType, text=None, period=6):
         now = datetime.today().now().strftime("%H%M")
         with open("config.json") as config:
             currentDay = datetime.today().weekday()
@@ -136,7 +134,7 @@ class App(tk.Frame):
             # takes closest number to current time as index from list
             linkIndex = [[0, 2, 4], [1, 3, 5], [0]]
             index = min(range(len(linkIndex[currentDay])), key=lambda i: abs(
-                int(times[i]) - int(now)))
+                times[i] - int(now)))
             currentPeriod = links[linkIndex[currentDay][index]]
             if(currentDay == 2 and not self.manual):
                 currentPeriod = links[6]
@@ -146,7 +144,8 @@ class App(tk.Frame):
                 currentPeriod = links[index]
                 labelText = f"{text} Link: \"{currentPeriod}\""
             else:
-                text = "Period " + str(linkIndex[currentDay][index]+1)
+                if(currentDay != 2):
+                    text = "Period " + str(linkIndex[currentDay][index]+1)
                 labels = ["No school today", links,
                           f"{text} Link: \"{currentPeriod}\""]
                 labelText = labels[dayType-1]

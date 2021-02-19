@@ -23,5 +23,3 @@ Note that this is likely going to be patched in the future
 ## Issues
 
 If you're having any problems just open up an issue on the [Github Repository](https://github.com/PopsicleTreehouse/GetZoomLink/issues).
-
-And of course, pull requests are welcome.
